@@ -1,5 +1,6 @@
 package com.mbas.E_commerce.controller;
 
+import com.mbas.E_commerce.dto.UserDto;
 import com.mbas.E_commerce.entities.User;
 import com.mbas.E_commerce.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -23,8 +25,16 @@ public class UserController {
     private final UserRepository userRepository;
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userRepository.findAll());
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        List<UserDto> userDtos = users.stream()
+                .map(user -> new UserDto(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail()
+                ))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userDtos);
     }
 
     @GetMapping("/{id}")
