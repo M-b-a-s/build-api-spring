@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -25,7 +28,17 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<User>> getUserById(@PathVariable Long id) {
-        return new ResponseEntity<Optional<User>>(userRepository.findById(id), HttpStatus.OK);
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        var user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "User not found with id: " + id);
+            errorResponse.put("status", "404");
+            errorResponse.put("timestamp", Instant.now().toString());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+
+        return ResponseEntity.ok(user);
+
     }
 }
