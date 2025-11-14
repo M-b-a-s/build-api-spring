@@ -1,6 +1,7 @@
 package com.mbas.E_commerce.controller;
 
 import com.mbas.E_commerce.dto.RegisterUserRequest;
+import com.mbas.E_commerce.dto.UpdateUserDto;
 import com.mbas.E_commerce.dto.UserDto;
 import com.mbas.E_commerce.entities.User;
 import com.mbas.E_commerce.repository.UserRepository;
@@ -22,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 @RestController
 @AllArgsConstructor
@@ -87,5 +90,23 @@ public ResponseEntity<UserDto> createUser(
     
     return ResponseEntity.created(uri).body(userDto);
 }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDto> updateUser(
+        @PathVariable(name = "id") Long id,
+        @RequestBody UpdateUserDto request) {
+            var user = userRepository.findById(id).orElse(null);
+            // check if user exists
+            if(user == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            user.setName(request.getName());
+            user.setEmail(request.getEmail());
+
+            userRepository.save(user);
+            return ResponseEntity.ok(new UserDto(user.getId(), user.getName(), user.getEmail()));
+
+    }
 
 }
