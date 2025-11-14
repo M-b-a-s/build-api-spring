@@ -1,12 +1,16 @@
 package com.mbas.E_commerce.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
-@Getter
+@NoArgsConstructor
+@Data
 public class UserDto {
     private Long id;
     private String name;
     private String email;
+
+
 }
