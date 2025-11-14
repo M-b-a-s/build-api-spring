@@ -1,17 +1,18 @@
 package com.mbas.E_commerce.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class UserDto {
+public class ProductDto {
     private Long id;
     private String name;
-    private String email;
-
-
+    private String description;
+    private BigDecimal price;
+    private String categoryName;
 }
