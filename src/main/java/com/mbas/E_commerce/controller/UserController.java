@@ -1,5 +1,6 @@
 package com.mbas.E_commerce.controller;
 
+import com.mbas.E_commerce.dto.RegisterUserRequest;
 import com.mbas.E_commerce.dto.UserDto;
 import com.mbas.E_commerce.entities.User;
 import com.mbas.E_commerce.repository.UserRepository;
@@ -8,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -54,4 +57,22 @@ public class UserController {
         return ResponseEntity.ok(userDto);
 
     }
+
+    @PostMapping
+public ResponseEntity<UserDto> createUser(@RequestBody RegisterUserRequest request) {
+    User user = new User();
+    user.setName(request.getName());
+    user.setEmail(request.getEmail());
+    user.setPassword(request.getPassword());
+
+    User savedUser = userRepository.save(user);
+    
+    UserDto userDto = new UserDto();
+    userDto.setId(savedUser.getId());
+    userDto.setName(savedUser.getName());
+    userDto.setEmail(savedUser.getEmail());
+    
+    return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
+}
+
 }
