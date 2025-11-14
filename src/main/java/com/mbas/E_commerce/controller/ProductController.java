@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @AllArgsConstructor
@@ -36,6 +38,7 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // Filter by category-name e.g "/books" or "/electronics"
     @GetMapping("/category-name/{categoryName}")
     public ResponseEntity<?> getProductsByCategoryName(@PathVariable String categoryName) {
         if (!productRepository.existsByCategoryName(categoryName)) {
@@ -48,5 +51,17 @@ public class ProductController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(productDtos);
     }
+
+     // Search by category name (case-insensitive, partial match)
+     @GetMapping("/category-search")
+     public ResponseEntity<List<ProductDto>> searchProductsByCategoryName(@RequestParam String categoryName) {
+        List<Product> products = productRepository.findByCategoryNameContainingIgnoreCase(categoryName);
+        List<ProductDto> productDtos = products.stream()
+                .map(ProductDto::fromEntity)
+                .collect(Collectors.toList());
+                
+        return ResponseEntity.ok(productDtos);
+     }
+     
 
 }
