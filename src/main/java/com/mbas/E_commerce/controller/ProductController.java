@@ -22,48 +22,31 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<List<ProductDto>> getAllProducts() {
-        List<Product> products = productRepository.findAll();
-        List<ProductDto> productDtos = products.stream()
-                .map(product -> new ProductDto(
-                        product.getId(),
-                        product.getName(),
-                        product.getDescription(),
-                        product.getPrice(),
-                        product.getCategory().getName()
-                ))
+        List<ProductDto> productDtos = productRepository.findAll().stream()
+                .map(ProductDto::fromEntity)
                 .collect(Collectors.toList());
-
         return ResponseEntity.ok(productDtos);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductDto> getProductById(@PathVariable Long id) {
         return productRepository.findById(id)
-                .map(product -> new ProductDto(
-                        product.getId(),
-                        product.getName(),
-                        product.getDescription(),
-                        product.getPrice(),
-                        product.getCategory().getName()
-                ))
+                .map(ProductDto::fromEntity)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Filter by category name
     @GetMapping("/category-name/{categoryName}")
-    public List<ProductDto> getProductsByCategoryName(@PathVariable String categoryName) {
-        List<Product> products = productRepository.findByCategoryName(categoryName);
+    public ResponseEntity<?> getProductsByCategoryName(@PathVariable String categoryName) {
+        if (!productRepository.existsByCategoryName(categoryName)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(categoryName + " Category not found");
+        }
 
-        return products.stream()
-                .map(product -> new ProductDto(
-                        product.getId(),
-                        product.getName(),
-                        product.getDescription(),
-                        product.getPrice(),
-                        product.getCategory().getName()
-                ))
+        List<ProductDto> productDtos = productRepository.findByCategoryName(categoryName).stream()
+                .map(ProductDto::fromEntity)
                 .collect(Collectors.toList());
+        return ResponseEntity.ok(productDtos);
     }
 
 }
