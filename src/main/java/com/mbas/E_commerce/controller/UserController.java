@@ -4,6 +4,8 @@ import com.mbas.E_commerce.dto.RegisterUserRequest;
 import com.mbas.E_commerce.dto.UserDto;
 import com.mbas.E_commerce.entities.User;
 import com.mbas.E_commerce.repository.UserRepository;
+
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -59,7 +62,15 @@ public class UserController {
     }
 
     @PostMapping
-public ResponseEntity<UserDto> createUser(@RequestBody RegisterUserRequest request) {
+public ResponseEntity<UserDto> createUser(
+    @Valid @RequestBody RegisterUserRequest request,
+    UriComponentsBuilder uriBuilder) {
+
+     // Check if email already exists
+    if (userRepository.existsByEmail(request.getEmail())) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    }
+
     User user = new User();
     user.setName(request.getName());
     user.setEmail(request.getEmail());
@@ -71,8 +82,10 @@ public ResponseEntity<UserDto> createUser(@RequestBody RegisterUserRequest reque
     userDto.setId(savedUser.getId());
     userDto.setName(savedUser.getName());
     userDto.setEmail(savedUser.getEmail());
+
+    var uri = uriBuilder.path("/users/{id}").buildAndExpand(userDto.getId()).toUri();
     
-    return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
+    return ResponseEntity.created(uri).body(userDto);
 }
 
 }
