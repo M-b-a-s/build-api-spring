@@ -66,31 +66,30 @@ public class UserController {
     }
 
     @PostMapping
-public ResponseEntity<UserDto> createUser(
-    @Valid @RequestBody RegisterUserRequest request,
-    UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<UserDto> createUser(
+        @Valid @RequestBody RegisterUserRequest request, UriComponentsBuilder uriBuilder) {
 
-     // Check if email already exists
-    if (userRepository.existsByEmail(request.getEmail())) {
+        // Check if email already exists
+        if (userRepository.existsByEmail(request.getEmail())) {
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+
+        User savedUser = userRepository.save(user);
+        
+        UserDto userDto = new UserDto();
+        userDto.setId(savedUser.getId());
+        userDto.setName(savedUser.getName());
+        userDto.setEmail(savedUser.getEmail());
+
+        var uri = uriBuilder.path("/users/{id}").buildAndExpand(userDto.getId()).toUri();
+        
+        return ResponseEntity.created(uri).body(userDto);
     }
-
-    User user = new User();
-    user.setName(request.getName());
-    user.setEmail(request.getEmail());
-    user.setPassword(request.getPassword());
-
-    User savedUser = userRepository.save(user);
-    
-    UserDto userDto = new UserDto();
-    userDto.setId(savedUser.getId());
-    userDto.setName(savedUser.getName());
-    userDto.setEmail(savedUser.getEmail());
-
-    var uri = uriBuilder.path("/users/{id}").buildAndExpand(userDto.getId()).toUri();
-    
-    return ResponseEntity.created(uri).body(userDto);
-}
 
     @PutMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(

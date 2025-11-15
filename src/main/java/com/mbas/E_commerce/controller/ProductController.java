@@ -4,6 +4,11 @@ import com.mbas.E_commerce.dto.ProductDto;
 import com.mbas.E_commerce.entities.Product;
 import com.mbas.E_commerce.repository.ProductRepository;
 import lombok.AllArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,11 +28,21 @@ public class ProductController {
     private final ProductRepository productRepository;
 
     @GetMapping
-    public ResponseEntity<List<ProductDto>> getAllProducts() {
-        List<ProductDto> productDtos = productRepository.findAll().stream()
-                .map(ProductDto::fromEntity)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(productDtos);
+    public ResponseEntity<Page<ProductDto>> getAllProducts(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        // List<ProductDto> productDtos = productRepository.findAll().stream()
+        //         .map(ProductDto::fromEntity)
+        //         .collect(Collectors.toList());
+        // return ResponseEntity.ok(productDtos);
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> productPage = productRepository.findAll(pageable);
+    
+        Page<ProductDto> productDtoPage = productPage.map(ProductDto::fromEntity);
+    
+        return ResponseEntity.ok(productDtoPage);
     }
 
     @GetMapping("/{id}")
