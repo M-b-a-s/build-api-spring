@@ -1,7 +1,9 @@
 package com.mbas.E_commerce.controller;
 
 import com.mbas.E_commerce.dto.ProductDto;
+import com.mbas.E_commerce.entities.Category;
 import com.mbas.E_commerce.entities.Product;
+import com.mbas.E_commerce.repository.CategoryRepository;
 import com.mbas.E_commerce.repository.ProductRepository;
 
 import jakarta.validation.Valid;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/products")
 public class ProductController {
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
     @GetMapping
     public ResponseEntity<Page<ProductDto>> getAllProducts(
@@ -90,12 +94,25 @@ public class ProductController {
      public ResponseEntity<ProductDto> createProduct(
         @Valid @RequestBody ProductDto productDto,
         UriComponentsBuilder uriBuilder) {
-       
 
-        // Create a URI for the newly created product
-        var uri = uriBuilder.path("/products/{id}").buildAndExpand(productDto.getId()).toUri();
+        // Find category by name
+         Category category = categoryRepository.findByName(productDto.getCategoryName())
+                 .orElseGet(() -> {
+                     Category newCat = new Category();
+                     newCat.setName(productDto.getCategoryName());
+                     return categoryRepository.save(newCat);
+                 });
 
-        return ResponseEntity.created(uri).body(productDto);
+         Product product = Product.builder()
+                 .name(productDto.getName())
+                 .description(productDto.getDescription())
+                 .price(productDto.getPrice())
+                 .category(category)
+                 .build();
+
+         Product saved = productRepository.save(product);
+         URI location = uriBuilder.path("/products/{id}").buildAndExpand(saved.getId()).toUri();
+         return ResponseEntity.created(location).body(ProductDto.fromEntity(saved));
      }
 
 }
