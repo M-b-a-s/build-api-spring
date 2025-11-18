@@ -59,12 +59,13 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> createUser(
+    public ResponseEntity<?> registerUser(
         @Valid @RequestBody RegisterUserRequest request, UriComponentsBuilder uriBuilder) {
 
         // Check if email already exists
         if (userRepository.existsByEmail(request.getEmail())) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        return ResponseEntity.badRequest().body(
+                Map.of("email", "Email is already in use."));
         }
 
         User user = new User();
