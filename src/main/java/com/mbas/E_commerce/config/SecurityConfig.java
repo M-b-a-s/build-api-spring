@@ -2,6 +2,7 @@ package com.mbas.E_commerce.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -19,7 +20,9 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(session ->
-                        session.anyRequest().permitAll()
+                                session.requestMatchers("/products/**").permitAll()
+                                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                                .anyRequest().authenticated()
                 );
         return http.build();
         // Disable CSRF
