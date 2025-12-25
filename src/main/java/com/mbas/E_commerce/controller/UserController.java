@@ -5,11 +5,13 @@ import com.mbas.E_commerce.dto.UpdateUserDto;
 import com.mbas.E_commerce.dto.UserDto;
 import com.mbas.E_commerce.entities.User;
 import com.mbas.E_commerce.repository.UserRepository;
+import com.mbas.E_commerce.mapper.EntityDtoMapper;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/users")
 public class UserController {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping
     public ResponseEntity<List<UserDto>> getAllUsers() {
@@ -68,17 +71,18 @@ public class UserController {
                 Map.of("email", "Email is already in use."));
         }
 
-        User user = new User();
-        user.setName(request.getName());
-        user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        // map request -> entity
+        User user = EntityDtoMapper.toUser(request);
+        // encode password before saving
+        if (user != null && user.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
 
+        assert user != null;
         User savedUser = userRepository.save(user);
-        
-        UserDto userDto = new UserDto();
-        userDto.setId(savedUser.getId());
-        userDto.setName(savedUser.getName());
-        userDto.setEmail(savedUser.getEmail());
+
+        // map entity -> response dto
+        UserDto userDto = EntityDtoMapper.toUserDto(savedUser);
 
         var uri = uriBuilder.path("/users/{id}").buildAndExpand(userDto.getId()).toUri();
         

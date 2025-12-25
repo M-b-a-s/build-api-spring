@@ -18,11 +18,11 @@ INSERT INTO categories (name) VALUES
 
 -- Insert users
 INSERT INTO users (name, email, password) VALUES
-('John Smith', 'john.smith@example.com', '$2a$10$N9qo8uLOickgx2ZMRZoMye.KbVkYJ.6QaRk6Uq6iZ7tCw6Q2QYq/W'),
-('Emma Johnson', 'emma.johnson@example.com', '$2a$10$N9qo8uLOickgx2ZMRZoMye.KbVkYJ.6QaRk6Uq6iZ7tCw6Q2QYq/W'),
-('Michael Brown', 'michael.brown@example.com', '$2a$10$N9qo8uLOickgx2ZMRZoMye.KbVkYJ.6QaRk6Uq6iZ7tCw6Q2QYq/W'),
-('Sarah Davis', 'sarah.davis@example.com', '$2a$10$N9qo8uLOickgx2ZMRZoMye.KbVkYJ.6QaRk6Uq6iZ7tCw6Q2QYq/W'),
-('David Wilson', 'david.wilson@example.com', '$2a$10$N9qo8uLOickgx2ZMRZoMye.KbVkYJ.6QaRk6Uq6iZ7tCw6Q2QYq/W');
+('John Smith', 'john.smith@example.com', '123456'),
+('Emma Johnson', 'emma.johnson@example.com', '123456'),
+('Michael Brown', 'michael.brown@example.com', '123456'),
+('Sarah Davis', 'sarah.davis@example.com', '123456'),
+('David Wilson', 'david.wilson@example.com', '123456');
 
 -- Insert products
 INSERT INTO products (name, description, price, category_id) VALUES
