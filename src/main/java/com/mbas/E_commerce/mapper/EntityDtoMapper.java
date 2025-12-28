@@ -1,5 +1,6 @@
 package com.mbas.E_commerce.mapper;
 
+import com.mbas.E_commerce.dto.LoginRequest;
 import com.mbas.E_commerce.dto.RegisterUserRequest;
 import com.mbas.E_commerce.dto.UpdateUserDto;
 import com.mbas.E_commerce.dto.UserDto;
